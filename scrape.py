@@ -10,6 +10,7 @@ import base64
 import urllib  # For quote_plus
 import urllib2
 import ast
+import ssl
 
 
 def get_config(configfile):
@@ -36,7 +37,7 @@ def get_config(configfile):
 def get_cryptparams(url):
     """ Retrives var modulus; var exponent from $url/js/rsa.js """
     fullurl = url + "/js/rsa.js"
-    urlfile = urllib2.urlopen(fullurl)
+    urlfile = urllib2.urlopen(fullurl, context=ssl._create_unverified_context())
     modulus, pubexp = None, None
 
     doing_modulus = False
@@ -102,7 +103,7 @@ def do_login(url, username, password):
     req = urllib2.Request(url + "/index/login.cgi")
     req.add_header('Cookie', 'Language=en_US; Username=foofoo')
     data = "Username=%s&Password=%s" % (username, password)
-    response = urllib2.urlopen(req, data)
+    response = urllib2.urlopen(req, data, context=ssl._create_unverified_context())
     cookie = response.headers.get('Set-Cookie')
     response.close()
     return cookie
@@ -112,7 +113,7 @@ def do_load_overview(url, cookie):
     """ Loads the overview page after sending a login request """
     req = urllib2.Request(url + "/html/status/overview.asp")
     req.add_header('cookie', cookie)
-    response = urllib2.urlopen(req)
+    response = urllib2.urlopen(req, context=ssl._create_unverified_context())
 
     # wanIPDNS, WanStatistics, wlanMAC
     # wlanStatistics, wlanErrStat
